@@ -1,7 +1,7 @@
 import express from 'express';
-import { getById } from '../service/movie.service.js';
+import {get} from "../controllers/movie.controller.js";
 const router = express.Router();
 
-router.get('/:id', getById);
+router.get('/:id', get);
 
 export default router;
