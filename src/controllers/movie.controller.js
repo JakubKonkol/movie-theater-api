@@ -4,7 +4,7 @@ export const getById = async (req, res) => {
     const id = req.params.id;
     try{
         let movie = getMovieById(id);
-        res.json(movie)
+        movie ? res.json(movie) : res.status(404).json({message: "Movie not found"});
     }catch (error){
         res.status(500).json({error: error.message});
     }

@@ -11,8 +11,8 @@
 - date: string
 - startTime: DateTime
 - endTime: DateTime
-- movie: Movie
-- room: room
+- movie: movieId
+- room: roomId
 
 ### room
 - id: number

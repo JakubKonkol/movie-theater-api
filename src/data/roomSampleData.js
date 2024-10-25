@@ -1,4 +1,4 @@
-const roomsSampleData = [
+export const roomsSampleData = [
     {
         id: 1,
         name: "Grand Cinema Hall",
