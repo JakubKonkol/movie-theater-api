@@ -10,6 +10,7 @@ import cors from "cors";
 import {CorsConfiguration} from "./src/configuration/CorsConfiguration.js";
 import {resolvers} from "./src/graphql/resolvers/resolvers.js";
 import {readFileSync} from "fs"
+import {ContentType} from "./src/middleware/ContentType.js";
 
 
 const typeDefs = readFileSync("src/graphql/schemas/schema.graphql", {encoding: "utf-8"});
@@ -21,7 +22,7 @@ await apolloServer.start();
 //middlewares
 app.use(bodyParser.json());
 app.use(cors(CorsConfiguration))
-// app.use(ContentType);
+app.use(ContentType);
 app.use(RequestMethods)
 
 // routes

@@ -1,0 +1,9 @@
+syntax = 'proto3';
+package movies;
+
+service MovieService {
+    rpc GetMovie(Empty) returns (Empty);
+}
+message Empty{
+
+}
