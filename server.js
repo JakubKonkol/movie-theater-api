@@ -11,26 +11,35 @@ import {CorsConfiguration} from "./src/configuration/CorsConfiguration.js";
 import {resolvers} from "./src/graphql/resolvers/resolvers.js";
 import {readFileSync} from "fs"
 import {ContentType} from "./src/middleware/ContentType.js";
-
+import {connectMongo} from "./src/db/db.js";
+import swaggerUi from 'swagger-ui-express';
+import {swaggerSpec} from "./src/configuration/swagger.js";
 
 const typeDefs = readFileSync("src/graphql/schemas/schema.graphql", {encoding: "utf-8"});
 const app = new express();
 const PORT = 8080;
-const apolloServer = new ApolloServer({typeDefs, resolvers });
+const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    playground: true,
+    introspection: true
+});
 await apolloServer.start();
+await connectMongo();
 
 //middlewares
 app.use(bodyParser.json());
 app.use(cors(CorsConfiguration))
-app.use(ContentType);
+// app.use(ContentType);
 app.use(RequestMethods)
 
 // routes
-app.use('/api/movie', movieRouter);
-app.use('/api/reservation', reservationRoute);
-app.use('/api/room', roomRoute);
+app.use('/api/movies', movieRouter);
+app.use('/api/reservations', reservationRoute);
+app.use('/api/rooms', roomRoute);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/graphql', express.json(), expressMiddleware(apolloServer));
 app.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT}`);
+    console.log(`🚀Server is running on PORT ${PORT}`);
 })

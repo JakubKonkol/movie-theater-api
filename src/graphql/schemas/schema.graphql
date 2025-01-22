@@ -1,10 +1,231 @@
+scalar DateTime
+scalar Date
+
 type Movie {
-    id: String,
-    title: String,
-    year: Int,
-    runtime: Int
+    id: ID!
+    title: String!
+    description: String!
+    duration: Int!
+    genre: String!
+    director: String!
+    cast: [String!]!
+    ratings: [Rating!]!
+    screenings: [Screening!]!
+    averageRating: Float
+}
+
+type Rating {
+    id: ID!
+    userId: ID!
+    score: Float!
+    comment: String
+    createdAt: DateTime!
+    user: User!
+}
+
+type Screening {
+    id: ID!
+    movie: Movie!
+    startTime: DateTime!
+    endTime: DateTime!
+    price: Float!
+    availableSeats: Int!
+    reservedSeats: [ReservedSeat!]!
+}
+
+type ReservedSeat {
+    seatNumber: String!
+    reservation: Reservation
+}
+
+type User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    role: String!
+    profile: UserProfile
+    reservationHistory: [Reservation!]!
+}
+
+type UserProfile {
+    phoneNumber: String
+    address: Address
+    preferences: Preferences
+}
+
+type Address {
+    street: String
+    city: String
+    postalCode: String
+}
+
+type Preferences {
+    favoriteGenres: [String!]
+    newsletterSubscribed: Boolean!
+}
+
+type Reservation {
+    id: ID!
+    user: User!
+    screening: Screening!
+    movie: Movie!
+    seats: [Seat!]!
+    totalPrice: Float!
+    status: ReservationStatus!
+    paymentDetails: PaymentDetails
+    createdAt: DateTime!
+}
+
+type Seat {
+    seatNumber: String!
+    price: Float!
+}
+
+type PaymentDetails {
+    method: PaymentMethod!
+    status: PaymentStatus!
+    transactionId: String
+}
+
+enum PaymentMethod {
+    CARD
+    CASH
+    TRANSFER
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+}
+
+enum ReservationStatus {
+    PENDING
+    CONFIRMED
+    CANCELLED
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
+
+input StringFilter {
+    eq: String
+    contains: String
+    ne: String
+    notContains: String
+}
+
+input NumberFilter {
+    eq: Float
+    gt: Float
+    lt: Float
+    gte: Float
+    lte: Float
+}
+
+input DateFilter {
+    eq: DateTime
+    gt: DateTime
+    lt: DateTime
+    gte: DateTime
+    lte: DateTime
+}
+
+input MovieInput {
+    title: String!
+    description: String!
+    duration: Int!
+    genre: String!
+    director: String!
+    cast: [String!]!
+}
+
+input MovieUpdateInput {
+    title: String
+    description: String
+    duration: Int
+    genre: String
+    director: String
+    cast: [String!]
+}
+
+input ScreeningInput {
+    movieId: ID!
+    startTime: DateTime!
+    endTime: DateTime!
+    price: Float!
+    availableSeats: Int!
+}
+
+input ReservationInput {
+    screeningId: ID!
+    seats: [SeatInput!]!
+    paymentMethod: PaymentMethod!
+}
+
+input SeatInput {
+    seatNumber: String!
+}
+
+input MovieFilterInput {
+    title: StringFilter
+    genre: StringFilter
+    duration: NumberFilter
+    director: StringFilter
+}
+
+input PaginationInput {
+    page: Int = 1
+    limit: Int = 10
+}
+
+input SortInput {
+    field: String!
+    order: SortOrder!
 }
 
 type Query {
-    movies: [Movie]
+    movies(
+        filter: MovieFilterInput
+        sort: SortInput
+        pagination: PaginationInput
+    ): [Movie!]!
+
+    movie(id: ID!): Movie
+
+    screenings(
+        movieId: ID!
+        dateFilter: DateFilter
+        pagination: PaginationInput
+    ): [Screening!]!
+
+    screening(id: ID!): Screening
+
+    reservations(
+        userId: ID
+        status: ReservationStatus
+        pagination: PaginationInput
+    ): [Reservation!]!
+
+    reservation(id: ID!): Reservation
+
+    user(id: ID!): User
+}
+
+type Mutation {
+    createMovie(input: MovieInput!): Movie!
+    updateMovie(id: ID!, input: MovieUpdateInput!): Movie!
+    deleteMovie(id: ID!): Boolean!
+
+    addMovieRating(movieId: ID!, score: Float!, comment: String): Rating!
+
+    createScreening(input: ScreeningInput!): Screening!
+    cancelScreening(id: ID!): Boolean!
+
+    createReservation(input: ReservationInput!): Reservation!
+    updateReservationStatus(id: ID!, status: ReservationStatus!): Reservation!
+    cancelReservation(id: ID!): Reservation!
 }
